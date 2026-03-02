@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rimas Alahmari — Contact</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header>
+    <div class="header-brand">Rimas <span>Alahmari</span></div>
+    <nav>
+      <a href="index.html">CV</a>
+      <a href="schedule.html">Class Schedule</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+  </header>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrapper">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- Profile picture placeholder -->
+      <div class="profile-img-wrapper">
+        <!-- Replace the icon below with an <img> tag once you have your photo:
+             <img src="images/ME.jpg" alt="Rimas Alahmari"> -->
+        <span class="profile-placeholder">
+          <i class="fa-regular fa-user"></i>
+        </span>
+      </div>
+
+      <div class="sidebar-name">Rimas Alahmari</div>
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Reach Me</div>
+        <div class="sidebar-contact-item">
+          <i class="fa-regular fa-envelope" style="margin-right:5px;color:var(--rose)"></i>
+          <a href="mailto:remashafiz13@gmail.com">remashafiz13@gmail.com</a>
+        </div>
+        <div class="sidebar-contact-item">
+          <i class="fa-solid fa-phone" style="margin-right:5px;color:var(--rose)"></i>
+          <a href="tel:+966577077104">+966 57 707 7104</a>
+        </div>
+        <div class="sidebar-contact-item">
+          <i class="fa-solid fa-location-dot" style="margin-right:5px;color:var(--rose)"></i>
+          Jeddah, Saudi Arabia
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <section class="section-block">
+        <h2 class="section-title">Contact</h2>
+        <p style="font-size:0.9rem;color:var(--text-light);margin-top:0.75rem;margin-bottom:0.5rem;">
+          Have a question or want to get in touch? Fill out the form below.
+        </p>
+
+        <!--
+          ACTION: Go to https://webhook.site, copy your unique URL,
+          and paste it in the action attribute below.
+        -->
+        <form
+          class="contact-form"
+          action="https://webhook.site/YOUR-UNIQUE-URL-HERE"
+          method="POST">
+
+          <!-- Name -->
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Your full name"
+              required />
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="your@email.com" />
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label for="message">Message <span class="required">*</span></label>
+            <textarea
+              id="message"
+              name="message"
+              rows="10"
+              placeholder="Write your message here..."
+              required></textarea>
+          </div>
+
+          <!-- Message Type -->
+          <div class="form-group">
+            <label>Message Type</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="message_type" value="inquiry" checked />
+                Inquiry
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="message_type" value="complaint" />
+                Complaint
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit">Send Message</button>
+
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2026 <span>Rimas Alahmari</span> — All Rights Reserved
+  </footer>
+
+</body>
+</html>
