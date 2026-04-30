@@ -611,6 +611,78 @@ tbody tr.weekend:hover td {
   box-shadow: 0 8px 20px rgba(201,132,106,0.3);
 }
 
+/* ========== LABS ========== */
+.labs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.lab-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--sand);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
+}
+
+.lab-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  border-color: var(--rose);
+}
+
+.lab-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--rose);
+  opacity: 0.4;
+  min-width: 50px;
+  line-height: 1;
+}
+
+.lab-info {
+  flex: 1;
+}
+
+.lab-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--deep);
+}
+
+.lab-course {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: 0.2rem;
+}
+
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--deep);
+  color: var(--cream);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.2rem;
+  border-radius: 2px;
+  white-space: nowrap;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.lab-btn:hover {
+  background: var(--rose);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(201,132,106,0.3);
+}
+
 /* ========== FOOTER ========== */
 footer {
   background: var(--deep);
