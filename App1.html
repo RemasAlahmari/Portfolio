@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scoop Builder 🍦</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"/>
+  <style>
+    :root {
+      --pink:    #ff6b9d;
+      --yellow:  #ffd93d;
+      --mint:    #6bcb77;
+      --blue:    #4d96ff;
+      --purple:  #c77dff;
+      --choc:    #8b5e3c;
+      --cream:   #fff8f0;
+      --dark:    #2d1b69;
+      --shadow:  0 8px 32px rgba(45,27,105,0.15);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #fff0f5 0%, #f0f4ff 50%, #f0fff4 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* floating background shapes */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255,107,157,0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(77,150,255,0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(107,203,119,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 100;
+      background: white;
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--dark);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+    .back-link:hover { transform: translateY(-2px); }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      color: var(--dark);
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+
+    .hero h1 span { color: var(--pink); }
+
+    .hero p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #666;
+      font-weight: 600;
+    }
+
+    /* Score bar */
+    .score-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1rem 0 2rem;
+      flex-wrap: wrap;
+    }
+
+    .score-pill {
+      background: white;
+      border-radius: 50px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Main layout */
+    .builder-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    @media (max-width: 680px) {
+      .builder-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Left panel */
+    .options-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .option-group {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .option-group h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.2rem;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .chip {
+      border: 2.5px solid transparent;
+      border-radius: 50px;
+      padding: 0.5rem 1.1rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f5f5f5;
+      color: #444;
+    }
+
+    .chip:hover { transform: translateY(-2px); filter: brightness(0.95); }
+
+    .chip.selected {
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* flavor colors */
+    .chip[data-flavor="Strawberry"].selected,
+    .chip[data-color="pink"].selected   { background: var(--pink); border-color: var(--pink); }
+    .chip[data-flavor="Vanilla"].selected,
+    .chip[data-color="yellow"].selected { background: var(--yellow); border-color: var(--yellow); color: var(--dark); }
+    .chip[data-flavor="Mint"].selected,
+    .chip[data-color="mint"].selected   { background: var(--mint); border-color: var(--mint); }
+    .chip[data-flavor="Blueberry"].selected,
+    .chip[data-color="blue"].selected   { background: var(--blue); border-color: var(--blue); }
+    .chip[data-flavor="Lavender"].selected,
+    .chip[data-color="purple"].selected { background: var(--purple); border-color: var(--purple); }
+    .chip[data-flavor="Chocolate"].selected,
+    .chip[data-color="choc"].selected   { background: var(--choc); border-color: var(--choc); }
+
+    /* cone/cup toggle */
+    .toggle-group { display: flex; gap: 0.6rem; }
+    .toggle-btn {
+      flex: 1;
+      padding: 0.7rem;
+      border: 2.5px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .toggle-btn.selected {
+      border-color: var(--pink);
+      background: #fff0f6;
+      color: var(--pink);
+    }
+
+    /* toppings multi-select */
+    .topping-chip {
+      border: 2.5px solid #e0e0e0;
+      border-radius: 50px;
+      padding: 0.45rem 1rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      color: #444;
+    }
+    .topping-chip:hover { transform: translateY(-2px); }
+    .topping-chip.selected {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    /* Right panel — ice cream preview */
+    .preview-panel {
+      position: sticky;
+      top: 1.5rem;
+      background: white;
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .preview-panel h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    /* SVG ice cream */
+    #icecream-svg {
+      width: 160px;
+      height: 220px;
+      margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12));
+    }
+
+    .creation-name {
+      margin-top: 1rem;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      color: var(--dark);
+      min-height: 1.8rem;
+    }
+
+    .toppings-display {
+      margin-top: 0.4rem;
+      font-size: 0.82rem;
+      color: #888;
+      font-weight: 600;
+      min-height: 1.2rem;
+    }
+
+    .calories {
+      margin-top: 0.8rem;
+      background: #fff8f0;
+      border-radius: 12px;
+      padding: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--choc);
+    }
+
+    .btn-order {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.85rem;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(255,107,157,0.4);
+    }
+
+    .btn-order:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(255,107,157,0.5);
+    }
+
+    .btn-order:active { transform: translateY(0); }
+
+    .btn-reset {
+      margin-top: 0.6rem;
+      width: 100%;
+      padding: 0.6rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      background: white;
+      color: #888;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-reset:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* Order popup */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(45,27,105,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-overlay.show { display: flex; }
+
+    .popup {
+      background: white;
+      border-radius: 28px;
+      padding: 2.5rem 2rem;
+      max-width: 380px;
+      width: 90%;
+      text-align: center;
+      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .popup .big-emoji { font-size: 4rem; }
+    .popup h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: var(--dark);
+      margin: 0.5rem 0;
+    }
+    .popup p { color: #666; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+    .popup .order-detail {
+      background: var(--cream);
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      font-size: 1rem;
+    }
+    .popup-btn {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      color: white;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,107,157,0.4);
+      transition: transform 0.2s;
+    }
+    .popup-btn:hover { transform: translateY(-2px); }
+
+    /* confetti particle */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 1.5s ease-in forwards;
+      pointer-events: none;
+      z-index: 300;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-10px) rotate(0deg);   opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="myworks.html" class="back-link">← My Works</a>
+
+  <div class="container">
+    <div class="hero">
+      <h1>🍦 Scoop <span>Builder</span></h1>
+      <p>Build your perfect ice cream and place your (imaginary) order!</p>
+    </div>
+
+    <div class="score-bar">
+      <div class="score-pill">🛒 Orders placed: <span id="order-count">0</span></div>
+      <div class="score-pill">⭐ Scoops built: <span id="scoop-count">0</span></div>
+    </div>
+
+    <div class="builder-layout">
+
+      <!-- OPTIONS -->
+      <div class="options-panel">
+
+        <!-- Container -->
+        <div class="option-group">
+          <h3>🥤 Choose your container</h3>
+          <div class="toggle-group">
+            <button class="toggle-btn selected" onclick="selectContainer('cone', this)">🍦 Waffle Cone</button>
+            <button class="toggle-btn" onclick="selectContainer('cup', this)">🥤 Cup</button>
+          </div>
+        </div>
+
+        <!-- Flavor 1 -->
+        <div class="option-group">
+          <h3>🎨 First scoop flavor</h3>
+          <div class="chips" id="flavor1-chips">
+            <button class="chip" data-flavor="Strawberry" onclick="selectFlavor(1,'Strawberry','#ff6b9d',this)">🍓 Strawberry</button>
+            <button class="chip" data-flavor="Vanilla"    onclick="selectFlavor(1,'Vanilla','#ffd93d',this)">🍌 Vanilla</button>
+            <button class="chip" data-flavor="Chocolate"  onclick="selectFlavor(1,'Chocolate','#8b5e3c',this)">🍫 Chocolate</button>
+            <button class="chip" data-flavor="Mint"       onclick="selectFlavor(1,'Mint','#6bcb77',this)">🌿 Mint Choc Chip</button>
+            <button class="chip" data-flavor="Blueberry"  onclick="selectFlavor(1,'Blueberry','#4d96ff',this)">🫐 Blueberry</button>
+            <button class="chip" data-flavor="Lavender"   onclick="selectFlavor(1,'Lavender','#c77dff',this)">💜 Lavender</button>
+          </div>
+        </div>
+
+        <!-- Flavor 2 -->
+        <div class="option-group">
+          <h3>🎨 Second scoop (optional)</h3>
+          <div class="chips" id="flavor2-chips">
+            <button class="chip" data-flavor="none" onclick="selectFlavor(2,'none','none',this)" style="background:#f5f5f5">✖ No second scoop</button>
+            <button class="chip" data-flavor="Strawberry" onclick="selectFlavor(2,'Strawberry','#ff6b9d',this)">🍓 Strawberry</button>
+            <button class="chip" data-flavor="Vanilla"    onclick="selectFlavor(2,'Vanilla','#ffd93d',this)">🍌 Vanilla</button>
+            <button class="chip" data-flavor="Chocolate"  onclick="selectFlavor(2,'Chocolate','#8b5e3c',this)">🍫 Chocolate</button>
+            <button class="chip" data-flavor="Mint"       onclick="selectFlavor(2,'Mint','#6bcb77',this)">🌿 Mint Choc Chip</button>
+            <button class="chip" data-flavor="Blueberry"  onclick="selectFlavor(2,'Blueberry','#4d96ff',this)">🫐 Blueberry</button>
+            <button class="chip" data-flavor="Lavender"   onclick="selectFlavor(2,'Lavender','#c77dff',this)">💜 Lavender</button>
+          </div>
+        </div>
+
+        <!-- Toppings -->
+        <div class="option-group">
+          <h3>✨ Toppings (pick any!)</h3>
+          <div class="chips" id="toppings-chips">
+            <button class="topping-chip" onclick="toggleTopping('🍫 Chocolate Sauce', this)">🍫 Chocolate Sauce</button>
+            <button class="topping-chip" onclick="toggleTopping('🍬 Sprinkles', this)">🍬 Sprinkles</button>
+            <button class="topping-chip" onclick="toggleTopping('🍒 Cherry on top', this)">🍒 Cherry on top</button>
+            <button class="topping-chip" onclick="toggleTopping('🥜 Crushed Nuts', this)">🥜 Crushed Nuts</button>
+            <button class="topping-chip" onclick="toggleTopping('🍪 Cookie Crumble', this)">🍪 Cookie Crumble</button>
+            <button class="topping-chip" onclick="toggleTopping('🍓 Fresh Berries', this)">🍓 Fresh Berries</button>
+            <button class="topping-chip" onclick="toggleTopping('🌈 Rainbow Sprinkles', this)">🌈 Rainbow Sprinkles</button>
+            <button class="topping-chip" onclick="toggleTopping('☁️ Whipped Cream', this)">☁️ Whipped Cream</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview-panel">
+        <h3>Your Creation 🎉</h3>
+
+        <svg id="icecream-svg" viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- Cone / cup -->
+          <g id="container-shape">
+            <!-- Cone default -->
+            <polygon id="cone-shape" points="80,215 35,110 125,110" fill="#d4a76a" stroke="#b8895a" stroke-width="2"/>
+            <line x1="55" y1="130" x2="80" y2="215" stroke="#b8895a" stroke-width="1.5" opacity="0.5"/>
+            <line x1="80" y1="120" x2="80" y2="215" stroke="#b8895a" stroke-width="1.5" opacity="0.5"/>
+            <line x1="105" y1="130" x2="80" y2="215" stroke="#b8895a" stroke-width="1.5" opacity="0.5"/>
+            <!-- Cup (hidden by default) -->
+            <rect id="cup-shape" x="35" y="110" width="90" height="80" rx="8" fill="#e8e0f8" stroke="#c5b8f0" stroke-width="2" display="none"/>
+            <rect id="cup-rim" x="30" y="106" width="100" height="12" rx="6" fill="#c5b8f0" display="none"/>
+          </g>
+
+          <!-- Scoop 2 (bottom, shown only if selected) -->
+          <ellipse id="scoop2" cx="80" cy="112" rx="42" ry="30" fill="#ffd93d" display="none"/>
+
+          <!-- Scoop 1 (top) -->
+          <ellipse id="scoop1" cx="80" cy="90" rx="42" ry="38" fill="#e0e0e0"/>
+          <!-- shine -->
+          <ellipse id="scoop1-shine" cx="65" cy="75" rx="10" ry="7" fill="white" opacity="0.3"/>
+
+          <!-- Toppings layer -->
+          <g id="toppings-layer">
+            <!-- cherry -->
+            <circle id="topping-cherry" cx="80" cy="54" r="8" fill="#e63946" display="none"/>
+            <line id="topping-cherry-stem" x1="80" y1="46" x2="85" y2="38" stroke="#2d6a4f" stroke-width="2" display="none"/>
+            <!-- whipped cream swirl -->
+            <path id="topping-cream" d="M65,58 Q72,48 80,52 Q88,48 95,58 Q88,52 80,56 Q72,52 65,58Z" fill="white" opacity="0.9" display="none"/>
+            <!-- sprinkles dots -->
+            <g id="topping-sprinkles" display="none">
+              <rect x="60" y="62" width="6" height="3" rx="1.5" fill="#ff6b9d" transform="rotate(30,63,63)"/>
+              <rect x="75" y="56" width="6" height="3" rx="1.5" fill="#ffd93d" transform="rotate(-20,78,57)"/>
+              <rect x="90" y="62" width="6" height="3" rx="1.5" fill="#4d96ff" transform="rotate(10,93,63)"/>
+              <rect x="68" y="68" width="6" height="3" rx="1.5" fill="#6bcb77" transform="rotate(45,71,69)"/>
+              <rect x="83" y="70" width="6" height="3" rx="1.5" fill="#c77dff" transform="rotate(-15,86,71)"/>
+            </g>
+          </g>
+        </svg>
+
+        <div class="creation-name" id="creation-name">Choose a flavor! 👆</div>
+        <div class="toppings-display" id="toppings-display"></div>
+
+        <div class="calories" id="calories-display">
+          🔥 ~0 cal (it's imaginary, enjoy!)
+        </div>
+
+        <button class="btn-order" onclick="placeOrder()">🎉 Place Order!</button>
+        <button class="btn-reset" onclick="resetAll()">Reset & Start Over</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ORDER POPUP -->
+  <div class="popup-overlay" id="popup-overlay">
+    <div class="popup">
+      <div class="big-emoji">🎊</div>
+      <h2>Order Placed!</h2>
+      <p>Your delicious creation is on its way... in your imagination 😄</p>
+      <div class="order-detail" id="popup-detail"></div>
+      <button class="popup-btn" onclick="closePopup()">Yum! Make Another 🍦</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      container: 'cone',
+      flavor1: null,
+      flavor1Color: null,
+      flavor2: null,
+      flavor2Color: null,
+      toppings: [],
+      orders: parseInt(localStorage.getItem('icecream_orders') || '0'),
+      scoops: parseInt(localStorage.getItem('icecream_scoops') || '0'),
+    };
+
+    const flavorCalories = { Strawberry:180, Vanilla:200, Chocolate:230, Mint:190, Blueberry:175, Lavender:165 };
+    const toppingCalories = { '🍫 Chocolate Sauce':80, '🍬 Sprinkles':30, '🍒 Cherry on top':20, '🥜 Crushed Nuts':60, '🍪 Cookie Crumble':70, '🍓 Fresh Berries':25, '🌈 Rainbow Sprinkles':30, '☁️ Whipped Cream':50 };
+    const flavorNames = { Strawberry:'Summer Dream', Vanilla:'Golden Classic', Chocolate:'Dark Delight', Mint:'Cool Breeze', Blueberry:'Berry Bliss', Lavender:'Purple Haze' };
+
+    // Init
+    document.getElementById('order-count').textContent = state.orders;
+    document.getElementById('scoop-count').textContent = state.scoops;
+
+    function selectContainer(type, btn) {
+      state.container = type;
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      const cone = document.getElementById('cone-shape');
+      const cup  = document.getElementById('cup-shape');
+      const rim  = document.getElementById('cup-rim');
+      const lines = document.querySelectorAll('#container-shape line');
+
+      if (type === 'cup') {
+        cone.style.display = 'none';
+        lines.forEach(l => l.style.display = 'none');
+        cup.setAttribute('display', '');
+        rim.setAttribute('display', '');
+      } else {
+        cone.style.display = '';
+        lines.forEach(l => l.style.display = '');
+        cup.setAttribute('display', 'none');
+        rim.setAttribute('display', 'none');
+      }
+      updatePreview();
+    }
+
+    function selectFlavor(slot, name, color, btn) {
+      const groupId = `flavor${slot}-chips`;
+      document.querySelectorAll(`#${groupId} .chip`).forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      if (slot === 1) {
+        state.flavor1 = name;
+        state.flavor1Color = color;
+        const s1 = document.getElementById('scoop1');
+        s1.setAttribute('fill', color === 'none' ? '#e0e0e0' : color);
+      } else {
+        state.flavor2 = name === 'none' ? null : name;
+        state.flavor2Color = color === 'none' ? null : color;
+        const s2 = document.getElementById('scoop2');
+        if (state.flavor2) {
+          s2.setAttribute('fill', color);
+          s2.setAttribute('display', '');
+          // push scoop1 up
+          document.getElementById('scoop1').setAttribute('cy', '70');
+          document.getElementById('scoop1-shine').setAttribute('cy', '56');
+        } else {
+          s2.setAttribute('display', 'none');
+          document.getElementById('scoop1').setAttribute('cy', '90');
+          document.getElementById('scoop1-shine').setAttribute('cy', '75');
+        }
+      }
+      updatePreview();
+    }
+
+    function toggleTopping(name, btn) {
+      btn.classList.toggle('selected');
+      if (state.toppings.includes(name)) {
+        state.toppings = state.toppings.filter(t => t !== name);
+      } else {
+        state.toppings.push(name);
+      }
+      // visual toppings
+      updateToppingVisuals();
+      updatePreview();
+    }
+
+    function updateToppingVisuals() {
+      const hasCherry  = state.toppings.includes('🍒 Cherry on top');
+      const hasCream   = state.toppings.includes('☁️ Whipped Cream');
+      const hasSprink  = state.toppings.includes('🍬 Sprinkles') || state.toppings.includes('🌈 Rainbow Sprinkles');
+
+      document.getElementById('topping-cherry').setAttribute('display', hasCherry ? '' : 'none');
+      document.getElementById('topping-cherry-stem').setAttribute('display', hasCherry ? '' : 'none');
+      document.getElementById('topping-cream').setAttribute('display', hasCream ? '' : 'none');
+      document.getElementById('topping-sprinkles').setAttribute('display', hasSprink ? '' : 'none');
+    }
+
+    function updatePreview() {
+      const nameEl  = document.getElementById('creation-name');
+      const topEl   = document.getElementById('toppings-display');
+      const calEl   = document.getElementById('calories-display');
+
+      if (!state.flavor1) {
+        nameEl.textContent = 'Choose a flavor! 👆';
+        calEl.textContent  = '🔥 ~0 cal (it\'s imaginary, enjoy!)';
+        topEl.textContent  = '';
+        return;
+      }
+
+      const baseName = flavorNames[state.flavor1] || state.flavor1;
+      const name2    = state.flavor2 ? ` + ${state.flavor2}` : '';
+      nameEl.textContent = `${baseName}${name2}`;
+
+      topEl.textContent = state.toppings.length
+        ? state.toppings.join(' · ')
+        : 'No toppings yet';
+
+      let cal = (flavorCalories[state.flavor1] || 0) + (state.flavor2 ? (flavorCalories[state.flavor2] || 0) : 0);
+      state.toppings.forEach(t => { cal += toppingCalories[t] || 0; });
+      calEl.textContent = `🔥 ~${cal} cal (it's imaginary, enjoy!)`;
+    }
+
+    function placeOrder() {
+      if (!state.flavor1) {
+        alert('🍦 Please pick at least a first scoop flavor!');
+        return;
+      }
+      state.orders++;
+      state.scoops += state.flavor2 ? 2 : 1;
+      localStorage.setItem('icecream_orders', state.orders);
+      localStorage.setItem('icecream_scoops', state.scoops);
+
+      document.getElementById('order-count').textContent = state.orders;
+      document.getElementById('scoop-count').textContent = state.scoops;
+
+      const detail = `${state.container === 'cone' ? '🍦 Waffle Cone' : '🥤 Cup'} · ${state.flavor1}${state.flavor2 ? ' + ' + state.flavor2 : ''} ${state.toppings.length ? '· ' + state.toppings.join(', ') : ''}`;
+      document.getElementById('popup-detail').textContent = detail;
+      document.getElementById('popup-overlay').classList.add('show');
+      launchConfetti();
+    }
+
+    function closePopup() {
+      document.getElementById('popup-overlay').classList.remove('show');
+    }
+
+    function resetAll() {
+      state.flavor1 = null; state.flavor1Color = null;
+      state.flavor2 = null; state.flavor2Color = null;
+      state.toppings = [];
+      document.querySelectorAll('.chip, .topping-chip').forEach(c => c.classList.remove('selected'));
+      document.getElementById('scoop1').setAttribute('fill', '#e0e0e0');
+      document.getElementById('scoop1').setAttribute('cy', '90');
+      document.getElementById('scoop1-shine').setAttribute('cy', '75');
+      document.getElementById('scoop2').setAttribute('display', 'none');
+      updateToppingVisuals();
+      updatePreview();
+    }
+
+    function launchConfetti() {
+      const colors = ['#ff6b9d','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9a3c'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.cssText = `
+          left: ${Math.random() * 100}vw;
+          top: -10px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          animation-delay: ${Math.random() * 0.8}s;
+          animation-duration: ${1 + Math.random() * 1}s;
+          transform: rotate(${Math.random() * 360}deg);
+          border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+        `;
+        document.body.appendChild(piece);
+        piece.addEventListener('animationend', () => piece.remove());
+      }
+    }
+  </script>
+</body>
+</html>
